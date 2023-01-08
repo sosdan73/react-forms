@@ -11,19 +11,40 @@ const BasicForm = (props) => {
 		handleInputBlur: handleFirstNameInputBlur,
 		reset: resetFirstName,
 	} = useInput(value => value.trim() !== '');
+	const {
+		value: lastNameValue,
+		hasError: lastNameHasError,
+		inputClasses: lastNameInputClasses,
+		isValid: lastNameIsValid,
+		handleInputChange: handleLastNameInputChange,
+		handleInputBlur: handleLastNameInputBlur,
+		reset: resetLastName,
+	} = useInput(value => value.trim() !== '');
+	const {
+		value: emailValue,
+		hasError: emailHasError,
+		inputClasses: emailInputClasses,
+		isValid: emailIsValid,
+		handleInputChange: handleEmailInputChange,
+		handleInputBlur: handleEmailInputBlur,
+		reset: resetEmail,
+	} = useInput(value => /\S+@\S+\.\S+/.test(value));
 
 	let formIsValid = false;
-	if (firstNameIsValid) {
+	if (firstNameIsValid && lastNameIsValid && emailIsValid) {
 		formIsValid = true
 	}
 
 	const handleFormSubmit = (e) => {
 		e.preventDefault();
-		if (!firstNameIsValid) {
-			console.log('The form is invalid')
+		if (!(firstNameIsValid && lastNameIsValid && emailIsValid)) {
+			console.log('The form is invalid');
+			return
 		}
-		console.log(firstNameValue);
+		console.log(firstNameValue, lastNameValue, emailValue);
 		resetFirstName();
+		resetLastName();
+		resetEmail();
 	}
 
     return (
@@ -40,14 +61,28 @@ const BasicForm = (props) => {
 					/>
 					{firstNameHasError && <p className="error-text">The field is required</p>}
                 </div>
-                <div className='form-control'>
-                    <label htmlFor='name'>Last Name</label>
-                    <input type='text' id='lastname' />
+                <div className={lastNameInputClasses}>
+                    <label htmlFor='lastname'>Last Name</label>
+					<input
+						type='text'
+						id='lastname'
+						value={lastNameValue}
+						onChange={handleLastNameInputChange}
+						onBlur={handleLastNameInputBlur}
+					/>
+					{lastNameHasError && <p className="error-text">The field is required</p>}
                 </div>
             </div>
-            <div className='form-control'>
+            <div className={emailInputClasses}>
                 <label htmlFor='email'>E-Mail Address</label>
-                <input type='text' id='email' />
+				<input
+					type='email'
+					id='email'
+					value={emailValue}
+					onChange={handleEmailInputChange}
+					onBlur={handleEmailInputBlur}
+				/>
+				{emailHasError && <p className="error-text">Enter a valid email</p>}
             </div>
             <div className='form-actions'>
                 <button type="submit" disabled={!formIsValid}>Submit</button>
